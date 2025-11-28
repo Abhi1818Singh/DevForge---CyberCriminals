@@ -1,0 +1,33 @@
+{
+  "data": {
+    "normalized_numbers": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "raw_numbers": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "stats": {
+      "average": 3.75,
+      "count": 5,
+      "max": 5,
+      "min": 1,
+      "normalized_count": 6,
+      "std_dev": 1.6007810593582121,
+      "total": 15.0,
+      "variance": 2.5625
+    }
+  },
+  "meta": {
+    "source_file": "numbers.txt",
+    "version": "1.0"
+  },
+  "status": "ok"
+}

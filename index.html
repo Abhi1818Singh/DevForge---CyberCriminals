@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DevForge – Local Code Auto-Repair</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      /* background: #0b1020; */
+      background: #0B3954;
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 16px 24px;
+      /* background: linear-gradient(90deg, #141b35, #111827); */
+      background: #4f7ca1;
+      border-bottom: 1px solid #1f2933;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.03em;
+    }
+    header span {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 12px;
+      padding: 12px;
+    }
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+    .panel {
+      /* background: #111827; */
+      background: #4f7ca1;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .panel-subtitle {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    textarea {
+      width: 100%;
+      flex: 1;
+      resize: none;
+      /* background: #020617; */
+      background: #0B3954;
+      color: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #1f2937;
+      padding: 10px;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      outline: none;
+    }
+    textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .controls-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    label {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    input[type="number"] {
+      width: 70px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 12px;
+    }
+    input[type="file"] {
+      font-size: 11px;
+    }
+    button {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #3b82f6;
+      color: #f9fafb;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    button.small {
+      padding: 4px 10px;
+      font-size: 11px;
+      box-shadow: none;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+    }
+    button span.icon {
+      font-size: 14px;
+    }
+    .status {
+      font-size: 12px;
+      opacity: 0.85;
+    }
+    .status.ok {
+      color: #22c55e;
+    }
+    .status.fail {
+      color: #f97373;
+    }
+    .status.wait {
+      color: #eab308;
+    }
+    .output-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      gap: 6px;
+    }
+    pre {
+      margin: 0;
+      padding: 10px;
+      background: #020617;
+      border-radius: 8px;
+      border: 1px solid #1f2937;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: #e5e7eb;
+      overflow: auto;
+      max-height: 50vh;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      /* background: #0f172a; */
+      background: #4f7ca1;
+      border: 1px solid #1f2937;
+      opacity: 0.9;
+    }
+    footer {
+      padding: 6px 12px;
+      font-size: 11px;
+      text-align: right;
+      color: #9ca3af;
+      border-top: 1px solid #111827;
+    }
+    .iterations-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .iteration-card {
+      border-radius: 8px;
+      border: 1px solid #1f2937;
+      padding: 8px;
+      background: #020617;
+    }
+    .iteration-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      border: 1px solid #1f2937;
+      margin-left: 4px;
+    }
+    .pill.ok {
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+    .pill.fail {
+      border-color: #f97373;
+      color: #f97373;
+    }
+    .pill.timeout {
+      border-color: #eab308;
+      color: #eab308;
+    }
+    .iteration-meta {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+    .small-textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 40px;
+      max-height: 120px;
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #1f2937;
+      padding: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      outline: none;
+    }
+    .small-textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>DevForge · Local Code Auto-Repair</h1>
+      <span>Runs fully on your machine · Python backend · Local LLM (Ollama)</span>
+    </div>
+    <div class="tag">
+      <span>Mode:</span><strong>Python · Hybrid rules + LLM</strong>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left: Input -->
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Input Code</div>
+          <div class="panel-subtitle">Paste or upload any Python file with bugs. The system will try to repair it.</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-left">
+          <label for="maxIterations">Max repair iterations:</label>
+          <input id="maxIterations" type="number" value="5" min="1" max="100" />
+          <label for="fileInput">or upload .py file:</label>
+          <input id="fileInput" type="file" accept=".py" />
+        </div>
+        <button id="repairBtn">
+          <span class="icon">⚙️</span>
+          <span>Auto-fix Code</span>
+        </button>
+      </div>
+
+      <div style="margin-bottom: 8px;">
+        <label for="instructionInput" style="font-size:12px;opacity:0.8;display:block;margin-bottom:4px;">
+          Instruction for Ollama (optional) – e.g. "just fix errors", "also optimize", "add logging", etc.
+        </label>
+        <textarea id="instructionInput" class="small-textarea" placeholder="Describe what you want the AI to do with this code..."></textarea>
+      </div>
+
+      <textarea id="codeInput" placeholder="Paste your buggy Python code here or upload a .py file above..."></textarea>
+    </section>
+
+    <!-- Right: Output -->
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Repair Result</div>
+          <div class="panel-subtitle">Final fixed code + per-iteration reasoning & logs.</div>
+        </div>
+        <div id="statusText" class="status">Idle.</div>
+      </div>
+
+      <div class="output-area">
+        <pre id="finalCode">Final code will appear here after repair.</pre>
+
+        <!-- Accept / Reject / Edit buttons -->
+        <div class="controls" style="margin-top: 4px;">
+          <div class="controls-left">
+            <button id="acceptBtn" class="small" disabled>✅ Accept & Download</button>
+            <button id="rejectBtn" class="small" disabled>❌ Reject</button>
+            <button id="editBtn" class="small" disabled>✏️ Edit & Retry</button>
+          </div>
+        </div>
+
+        <div class="iterations-list" id="iterationsList">
+          <!-- Iteration cards injected by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    DevForge · Local AI Debugger · Hackathon build
+  </footer>
+
+  <script>
+    const btn = document.getElementById("repairBtn");
+    const codeInput = document.getElementById("codeInput");
+    const maxIterationsInput = document.getElementById("maxIterations");
+    const statusText = document.getElementById("statusText");
+    const finalCodePre = document.getElementById("finalCode");
+    const iterationsList = document.getElementById("iterationsList");
+    const instructionInput = document.getElementById("instructionInput");
+    const fileInput = document.getElementById("fileInput");
+
+    const acceptBtn = document.getElementById("acceptBtn");
+    const rejectBtn = document.getElementById("rejectBtn");
+    const editBtn = document.getElementById("editBtn");
+
+    let uploadedFilename = null;
+    let lastResultAvailable = false;
+
+    // Handle file upload -> read file content into textarea
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      uploadedFilename = file.name;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        codeInput.value = e.target.result;
+      };
+      reader.readAsText(file);
+    });
+
+    function setPostActionButtonsEnabled(enabled) {
+      acceptBtn.disabled = !enabled;
+      rejectBtn.disabled = !enabled;
+      editBtn.disabled = !enabled;
+      lastResultAvailable = enabled;
+    }
+
+    async function callRepairAPI() {
+      const code = codeInput.value;
+      const maxIterations = parseInt(maxIterationsInput.value, 10) || 100;
+
+      const instruction = instructionInput.value;
+
+      if (!code.trim()) {
+        alert("Please paste some Python code or upload a .py file first.");
+        return;
+      }
+
+      btn.disabled = true;
+      setPostActionButtonsEnabled(false);
+
+      statusText.textContent = "Working… trying to repair your code.";
+      statusText.className = "status wait";
+      finalCodePre.textContent = "Running repair loop...";
+      iterationsList.innerHTML = "";
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/repair", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            code,
+            max_iterations: maxIterations,
+            instruction: instruction || null,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Server error: " + res.status);
+        }
+
+        const data = await res.json();
+
+        if (data.success) {
+          statusText.textContent = "Repair succeeded.";
+          statusText.className = "status ok";
+        } else {
+          statusText.textContent = "Repair failed: " + (data.failure_reason || "Unknown reason");
+          statusText.className = "status fail";
+        }
+
+        finalCodePre.textContent = data.final_code || "// No final code available.";
+        setPostActionButtonsEnabled(!!data.final_code);
+
+        iterationsList.innerHTML = "";
+        data.iterations.forEach(iter => {
+          const card = document.createElement("div");
+          card.className = "iteration-card";
+
+          const title = document.createElement("div");
+          title.className = "iteration-title";
+          title.textContent = `Iteration ${iter.iteration}`;
+
+          const pill = document.createElement("span");
+          pill.className = "pill";
+          if (iter.timeout) {
+            pill.classList.add("timeout");
+            pill.textContent = "Timeout";
+          } else if (iter.success) {
+            pill.classList.add("ok");
+            pill.textContent = "Success";
+          } else {
+            pill.classList.add("fail");
+            pill.textContent = "Failed";
+          }
+          title.appendChild(pill);
+
+          const meta = document.createElement("div");
+          meta.className = "iteration-meta";
+          meta.textContent =
+            `Return code: ${iter.return_code} · Patch: ${iter.patch_description || "None"}`;
+
+          const notes = document.createElement("pre");
+          notes.textContent = "Notes: " + (iter.notes || "");
+
+          const stderr = document.createElement("pre");
+          stderr.textContent = "STDERR:\n" + (iter.stderr || "(empty)");
+
+          const stdout = document.createElement("pre");
+          stdout.textContent = "STDOUT:\n" + (iter.stdout || "(empty)");
+
+          card.appendChild(title);
+          card.appendChild(meta);
+          card.appendChild(notes);
+          card.appendChild(stderr);
+          card.appendChild(stdout);
+
+          iterationsList.appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = "Error calling backend: " + err.message;
+        statusText.className = "status fail";
+        finalCodePre.textContent = "// Backend call failed.";
+        setPostActionButtonsEnabled(false);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener("click", callRepairAPI);
+
+    // Accept -> download fixed code as .py
+    acceptBtn.addEventListener("click", () => {
+      if (!lastResultAvailable) return;
+      const code = finalCodePre.textContent || "";
+      const blob = new Blob([code], { type: "text/x-python" });
+
+      const a = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      a.href = url;
+
+      const baseName = uploadedFilename || "fixed_code.py";
+      const suggestedName = baseName.endsWith(".py")
+        ? baseName.replace(/\.py$/i, "_fixed.py")
+        : baseName + "_fixed.py";
+
+      a.download = suggestedName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    // Reject -> just clear status / disable actions
+    rejectBtn.addEventListener("click", () => {
+      if (!lastResultAvailable) return;
+      alert("You rejected this repaired code. No file was saved.");
+      setPostActionButtonsEnabled(false);
+    });
+
+    // Edit & Retry -> copy final code back into input and let user re-run
+    editBtn.addEventListener("click", () => {
+      if (!lastResultAvailable) return;
+      codeInput.value = finalCodePre.textContent || "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      alert("Final code copied back to input. You can edit it and click Auto-fix again.");
+    });
+  </script>
+</body>
+</html>
